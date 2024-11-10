@@ -6,3 +6,13 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model History {
+  id         String  @id @default(cuid())
+  gameId     String
+  winner     String?
+  board      String
+  players    String
+  created_at String
+  status     String  @default("in progress")
+}
