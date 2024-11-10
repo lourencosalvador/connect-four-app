@@ -8,11 +8,11 @@ datasource db {
 }
 
 model History {
-  id         String  @id @default(cuid())
-  gameId     String
+  id         String   @id @default(cuid())
+  gameId     String   @unique
   winner     String?
   board      String
   players    String
-  created_at String
-  status     String  @default("in progress")
+  created_at DateTime @default(now())
+  status     String   @default("in progress")
 }
