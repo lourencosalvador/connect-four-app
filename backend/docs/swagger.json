@@ -1,0 +1,227 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Connect Four Game API",
+    "version": "1.0.0",
+    "description": "API for managing game history for Connect Four game",
+    "contact": {
+      "email": "adaobegginer@gmail.com"
+    }
+  },
+
+  "paths": {
+    "/history": {
+      "get": {
+        "tags": ["History"],
+        "summary": "Get game history",
+        "description": "Retrieve the list of game history records.",
+        "responses": {
+          "200": {
+            "description": "A list of game history records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GameHistory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["History"],
+        "summary": "Create a game history record",
+        "description": "Create a new game history record.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameHistory"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Game history record created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameHistory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/history/{id}": {
+      "get": {
+        "tags": ["History"],
+        "summary": "Get a specific game history record",
+        "description": "Retrieve a specific game history record by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the game history record"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A specific game history record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameHistory"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Game history record not found."
+          }
+        }
+      },
+      "put": {
+        "tags": ["History"],
+        "summary": "Update a game history record",
+        "description": "Update a specific game history record by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the game history record"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameHistory"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Game history record updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameHistory"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Game history record not found."
+          }
+        }
+      },
+      "delete": {
+        "tags": ["History"],
+        "summary": "Delete a game history record",
+        "description": "Delete a specific game history record by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the game history record"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Game history record deleted successfully."
+          },
+          "404": {
+            "description": "Game history record not found."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormant": "JWT"
+      }
+    },
+    "schemas": {
+      "GameHistory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "cl8xtt2kq0001x7yjovjk0h4f"
+          },
+          "gameId": {
+            "type": "string",
+            "example": "game-123"
+          },
+          "winner": {
+            "type": "string",
+            "nullable": true,
+            "example": "Player 1"
+          },
+          "board": {
+            "type": "string",
+            "example": "[[0,1,0],[0,0,1],...]"
+          },
+          "players": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "player-1"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Alice"
+                },
+                "score": {
+                  "type": "integer",
+                  "example": 20
+                }
+              }
+            },
+            "example": [
+              { "id": "player-1", "name": "Alice", "score": 20 },
+              { "id": "player-2", "name": "Bob", "score": 15 }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-11-10T15:00:00Z"
+          },
+          "status": {
+            "type": "string",
+            "example": "in progress"
+          }
+        }
+      }
+    }
+  }
+}

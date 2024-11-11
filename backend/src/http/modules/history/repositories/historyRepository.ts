@@ -14,16 +14,24 @@ export class HistoryRepository {
         gameId,
         winner,
         board,
-        players,
+        players: JSON.stringify(players),
         status,
       },
     });
   }
 
   static async getHistoryByGameId(gameId: string): Promise<HistoryDto | null> {
-    return prisma.history.findUnique({
+    const history = await prisma.history.findUnique({
       where: { gameId },
     });
+
+    if (history) {
+      return {
+        ...history,
+        players: JSON.parse(history.players),
+      };
+    }
+    return null;
   }
 
   static async getAllHistory(): Promise<HistoryDto[]> {

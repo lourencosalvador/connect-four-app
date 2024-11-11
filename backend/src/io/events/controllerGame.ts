@@ -1,10 +1,16 @@
-import { io } from "../app";
+import { io } from "../../core/app";
+import { v4 as uuidV4 } from "uuid";
 
 io.on("connection", (socket) => {
+  console.log(socket.id);
   socket.on("createGame", () => {
-    const gameId = Math.random().toString(36).substr(2, 9);
+    const gameId = uuidV4();
+
     socket.join(gameId);
     socket.emit("notification", `You created a new game with id ${gameId}`);
+
+    console.log(gameId);
+
     io.to(gameId).emit("gameCreated", gameId);
   });
 
