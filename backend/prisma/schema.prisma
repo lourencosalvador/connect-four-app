@@ -3,22 +3,22 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model History {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  id         String   @id @default(uuid())
   gameId     String   @unique
   winner     String?
   board      String?
-  players    Json
+  players    String
   created_at DateTime @default(now())
   status     String   @default("in progress")
 }
 
 model Player {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  id     String @id @default(uuid())
   gameId String @unique
   name   String
   avatar String

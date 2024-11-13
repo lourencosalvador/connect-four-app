@@ -33,7 +33,12 @@ const GameComponent: React.FC = () => {
     };
   }, []);
 
-  const handleCreateGame = () => createGame();
+  const handleCreateGame = () =>
+    createGame({
+      name: "none",
+      avatar: "none",
+      player: "none",
+    });
 
   const handleJoinGame = () => {
     const id = prompt("Enter game ID to join:");

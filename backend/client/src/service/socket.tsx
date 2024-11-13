@@ -12,14 +12,20 @@ interface Message {
   player: string;
 }
 
+interface Player {
+  name: string;
+  avatar: string;
+  player: string;
+}
+
 interface GameResult {
   winner: string;
 }
 
 export const socket: Socket = io(baseUrlSocket);
 
-export const createGame = () => {
-  socket.emit("createGame");
+export const createGame = (player: Player) => {
+  socket.emit("createGame", player);
 };
 
 export const joinGame = (gameId: string) => {
