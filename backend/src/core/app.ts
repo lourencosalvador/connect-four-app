@@ -54,6 +54,14 @@ io.on("connection", (socket) => {
   socket.on("joinGame", (gameId) => {
     socket.join(gameId);
     socket.emit("notification", `You join on room ${gameId}`);
+
+    io.to(gameId).emit("joinedGame", `user joined im room ${gameId}`);
+
+    const clientsInRoom = Array.from(
+      io.sockets.adapter.rooms.get(gameId) || []
+    );
+    socket.emit("allClientsInRoom", clientsInRoom);
+    console.log(`Clients in room ${gameId}:`, clientsInRoom);
   });
 
   socket.on("playMove", ({ gameId, position, player }) => {
