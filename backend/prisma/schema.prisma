@@ -16,3 +16,11 @@ model History {
   created_at DateTime @default(now())
   status     String   @default("in progress")
 }
+
+model Player {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  gameId String @unique
+  name   String
+  avatar String
+  player String
+}

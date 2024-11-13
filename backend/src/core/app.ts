@@ -14,6 +14,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { v4 as uuidV4 } from "uuid";
 
+import { prisma } from "../http/config/@clientPrisma";
+
 const app = express();
 
 app.use(morgan("dev"));
@@ -42,11 +44,20 @@ const io = new Server(httpServer, {
 });
 
 io.on("connection", (socket) => {
-  socket.on("createGame", () => {
+  socket.on("createGame", async ({ name, avatar, player }) => {
     const gameId = uuidV4();
 
     socket.join(gameId);
     socket.emit("notification", `You created a new game with id ${gameId}`);
+
+    const playerRoom = {
+      gameId,
+      name,
+      avatar,
+      player,
+    };
+
+    await prisma.player.create({ data: playerRoom });
 
     io.to(gameId).emit("gameCreated", gameId);
   });
@@ -78,6 +89,11 @@ io.on("connection", (socket) => {
 
   socket.on("restartGame", (gameId) => {
     io.to(gameId).emit("gameRestarted");
+  });
+
+  socket.on("playerRoom", async (gameId) => {
+    const playerInRoom = await prisma.player.findMany({ where: { gameId } });
+    socket.emit("playersRoom", playerInRoom);
   });
 
   socket.on("sendMessage", ({ gameId, message, player }) => {
