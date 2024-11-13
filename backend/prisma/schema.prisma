@@ -19,7 +19,7 @@ model History {
 
 model Player {
   id     String @id @default(uuid())
-  gameId String @unique
+  gameId String
   name   String
   avatar String
   player String

@@ -45,39 +45,66 @@ const io = new Server(httpServer, {
 
 io.on("connection", (socket) => {
   socket.on("createGame", async ({ name, avatar, player }) => {
-    const gameId = uuidV4();
+    const existingPlayer = await prisma.player.findFirst({
+      where: {
+        name: name,
+      },
+    });
 
-    socket.join(gameId);
-    socket.emit("notification", `You created a new game with id ${gameId}`);
+    if (existingPlayer) {
+      socket.emit(
+        "notification",
+        `Error: Name already in use. Choose a different name.`
+      );
+    } else {
+      const gameId = uuidV4();
 
-    const playerRoom = {
-      gameId,
-      name,
-      avatar,
-      player,
-    };
+      socket.join(gameId);
+      socket.emit("notification", `You created a new game with id ${gameId}`);
 
-    console.log(playerRoom);
-    await prisma.player.create({ data: playerRoom });
+      const playerRoom = {
+        gameId,
+        name,
+        avatar,
+        player,
+      };
 
-    io.to(gameId).emit("gameCreated", gameId);
+      console.log(playerRoom);
+      await prisma.player.create({ data: playerRoom });
+
+      io.to(gameId).emit("gameCreated", gameId);
+    }
   });
 
   socket.on("joinGame", async ({ gameId, name, avatar, player }) => {
     if (gameId || name || avatar || player) {
-      socket.join(gameId);
-      socket.emit("notification", `You join on room ${gameId}`);
-      await prisma.player.create({
-        data: {
-          name,
-          gameId,
-          player,
-          avatar,
+      const existingPlayer = await prisma.player.findFirst({
+        where: {
+          name: name,
+          gameId: gameId,
         },
       });
-      io.to(gameId).emit("joinedGame", `user joined im room ${gameId}`);
+
+      if (existingPlayer) {
+        socket.emit(
+          "notification",
+          `Error: Name already in use in room ${gameId}`
+        );
+      } else {
+        socket.join(gameId);
+        socket.emit("notification", `You joined room ${gameId}`);
+        await prisma.player.create({
+          data: {
+            name,
+            gameId,
+            player,
+            avatar,
+          },
+        });
+        io.to(gameId).emit("joinedGame", `User joined room ${gameId}`);
+      }
     } else {
-      socket.emit("notification", `Error: not send a data`);
+      socket.emit("notification", `Error: Missing data`);
     }
   });
 
