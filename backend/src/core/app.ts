@@ -45,16 +45,21 @@ const io = new Server(httpServer, {
 
 io.on("connection", (socket) => {
   socket.on("createGame", async ({ name, avatar, player }) => {
+    if (!name || !avatar || !player) {
+      return socket.emit(
+        "notification",
+        "Error: Missing data for game creation."
+      );
+    }
+
     const existingPlayer = await prisma.player.findFirst({
-      where: {
-        name: name,
-      },
+      where: { name: name },
     });
 
     if (existingPlayer) {
       socket.emit(
         "notification",
-        `Error: Name already in use. Choose a different name.`
+        "Error: Name already in use. Choose a different name."
       );
     } else {
       const gameId = uuidV4();
@@ -62,12 +67,7 @@ io.on("connection", (socket) => {
       socket.join(gameId);
       socket.emit("notification", `You created a new game with id ${gameId}`);
 
-      const playerRoom = {
-        gameId,
-        name,
-        avatar,
-        player,
-      };
+      const playerRoom = { gameId, name, avatar, player };
 
       console.log(playerRoom);
       await prisma.player.create({ data: playerRoom });
@@ -77,6 +77,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("joinGame", async ({ gameId, name, avatar, player }) => {
+    if (!gameId || !name || !avatar || !player) {
+      return socket.emit(
+        "notification",
+        "Error: Missing data for joining game."
+      );
+    }
     if (gameId || name || avatar || player) {
       const existingPlayer = await prisma.player.findFirst({
         where: {
@@ -109,6 +115,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("playMove", ({ gameId, position, player }) => {
+    if (!gameId || !position || !player) {
+      return socket.emit("notification", "Error: Missing data for move.");
+    }
     io.to(gameId).emit("movePlayed", { position, player });
   });
 
