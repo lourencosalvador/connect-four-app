@@ -8,6 +8,6 @@ export interface CreateHistoryDto {
   gameId: string;
   winner?: string | null;
   board?: string | null;
-  players: Player[];
+  players: string;
   status?: string;
 }

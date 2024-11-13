@@ -9,7 +9,7 @@ export interface HistoryDto {
   gameId: string;
   winner: string | null;
   board: string | null;
-  players: JSON;
+  players: string;
   created_at: Date;
   status: string;
 }
