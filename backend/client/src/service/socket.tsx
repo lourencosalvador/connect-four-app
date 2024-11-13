@@ -18,6 +18,14 @@ interface Player {
   player: string;
 }
 
+export interface PlayerProps {
+  id: string;
+  gameId: string;
+  name: string;
+  avatar: string;
+  player: string;
+}
+
 interface GameResult {
   winner: string;
 }
@@ -26,6 +34,10 @@ export const socket: Socket = io(baseUrlSocket);
 
 export const createGame = (player: Player) => {
   socket.emit("createGame", player);
+};
+
+export const PlayersRoom = (gameId: string) => {
+  socket.emit("playersRoom", gameId);
 };
 
 export const joinGame = (gameId: string) => {
@@ -54,6 +66,10 @@ export const sendMessage = (
 
 export const onGameCreated = (callback: (gameId: string) => void) => {
   socket.on("gameCreated", callback);
+};
+
+export const onPlayersRoom = (callback: (players: PlayerProps[]) => void) => {
+  socket.on("playersRoom", callback);
 };
 
 export const onMovePlayed = (callback: (move: Move) => void) => {

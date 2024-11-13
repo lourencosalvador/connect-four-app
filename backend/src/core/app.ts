@@ -57,29 +57,31 @@ io.on("connection", (socket) => {
       player,
     };
 
+    console.log(playerRoom);
     await prisma.player.create({ data: playerRoom });
 
     io.to(gameId).emit("gameCreated", gameId);
   });
 
-  socket.on("joinGame", (gameId) => {
-    socket.join(gameId);
-    socket.emit("notification", `You join on room ${gameId}`);
-
-    io.to(gameId).emit("joinedGame", `user joined im room ${gameId}`);
-
-    const clientsInRoom = Array.from(
-      io.sockets.adapter.rooms.get(gameId) || []
-    );
-    socket.emit("allClientsInRoom", clientsInRoom);
-    console.log(`Clients in room ${gameId}:`, clientsInRoom);
+  socket.on("joinGame", async ({ gameId, name, avatar, player }) => {
+    if (gameId || name || avatar || player) {
+      socket.join(gameId);
+      socket.emit("notification", `You join on room ${gameId}`);
+      await prisma.player.create({
+        data: {
+          name,
+          gameId,
+          player,
+          avatar,
+        },
+      });
+      io.to(gameId).emit("joinedGame", `user joined im room ${gameId}`);
+    } else {
+      socket.emit("notification", `Error: not send a data`);
+    }
   });
 
   socket.on("playMove", ({ gameId, position, player }) => {
-    /* 
-       [] - gama validations 
-       [*] - Emit our user in room 
-     */
     io.to(gameId).emit("movePlayed", { position, player });
   });
 
@@ -91,16 +93,13 @@ io.on("connection", (socket) => {
     io.to(gameId).emit("gameRestarted");
   });
 
-  socket.on("playerRoom", async (gameId) => {
+  socket.on("playersRoom", async (gameId) => {
     const playerInRoom = await prisma.player.findMany({ where: { gameId } });
-    socket.emit("playersRoom", playerInRoom);
+
+    io.to(gameId).emit("playersRoom", playerInRoom);
   });
 
   socket.on("sendMessage", ({ gameId, message, player }) => {
-    /* 
-       [] - gama validations 
-       [*] - Emit our user in room 
-     */
     io.to(gameId).emit("receiveMessage", { message, player });
   });
 });

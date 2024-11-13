@@ -9,6 +9,9 @@ import {
   onGameEnded,
   onGameRestarted,
   onNotification,
+  PlayersRoom,
+  onPlayersRoom,
+  PlayerProps,
 } from "../service/socket";
 
 interface Move {
@@ -20,6 +23,7 @@ const GameComponent: React.FC = () => {
   const [gameId, setGameId] = useState<string | null>(null);
   const [moves, setMoves] = useState<Move[]>([]);
   const [notifications, setNotifications] = useState<string[]>([]);
+  const [players, setPlayers] = useState<PlayerProps[]>([]);
 
   useEffect(() => {
     onGameCreated((id: string) => setGameId(id));
@@ -27,6 +31,11 @@ const GameComponent: React.FC = () => {
     onGameEnded((result) => alert(`Game ended, winner: ${result.winner}`));
     onGameRestarted(() => setMoves([]));
     onNotification((msg: string) => setNotifications((prev) => [...prev, msg]));
+
+    onPlayersRoom((playerRoom: PlayerProps[]) => {
+      setPlayers(playerRoom);
+      console.log(playerRoom);
+    });
 
     return () => {
       // Optionally, remove listeners here if needed
@@ -56,6 +65,10 @@ const GameComponent: React.FC = () => {
     if (gameId) restartGame(gameId);
   };
 
+  const handlePlayerRoom = () => {
+    if (gameId) PlayersRoom(gameId);
+  };
+
   return (
     <div>
       <h2>Game ID: {gameId}</h2>
@@ -63,6 +76,7 @@ const GameComponent: React.FC = () => {
       <button onClick={handleJoinGame}>Join Game</button>
       <button onClick={handlePlayMove}>Play Move</button>
       <button onClick={handleRestartGame}>Restart Game</button>
+      <button onClick={handlePlayerRoom}>Player in rooms</button>
       <div>
         <h3>Moves:</h3>
         <ul>
